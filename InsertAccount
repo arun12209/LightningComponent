@@ -1,7 +1,7 @@
 <!--Component-->
 <aura:component implements="force:appHostable" controller="AccountController">
     <aura:attribute name="newAccount" type="Account" default="{ 'sobjectType': 'Account', 'Name': '', }" access="public"/>
-    <aura:attribute name="AssignId" type="User" default=""/>
+    <aura:attribute name="AssignId" type="string" default=""/>
     <aura:handler name="change" value="{!v.newAccount.Assigned_To__c}" action="{!c.GetId}"/>
     <div >
         <center>
@@ -48,6 +48,7 @@
 </aura:component>
 
 
+
 <--Js Controller-->
 ({
    
@@ -58,7 +59,7 @@
     var action = component.get("c.saveAccount");
     action.setParams({
         "acc": newAcc,
-        "AssignId":assignId
+        "aid":assignId
     });
     action.setCallback(this, function(a) {
            var state = a.getState();
