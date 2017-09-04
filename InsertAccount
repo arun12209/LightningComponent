@@ -1,0 +1,91 @@
+<!--Component-->
+<aura:component implements="force:appHostable" controller="AccountController">
+    <aura:attribute name="newAccount" type="Account" default="{ 'sobjectType': 'Account', 'Name': '', }" access="public"/>
+    <aura:attribute name="AssignId" type="User" default=""/>
+    <aura:handler name="change" value="{!v.newAccount.Assigned_To__c}" action="{!c.GetId}"/>
+    <div >
+        <center>
+                <table>
+                	<tr>
+                        <td> Name </td>
+                        <td><force:inputField aura:id="Name" value="{!v.newAccount.Name}"/></td>
+                    </tr>
+                    <tr>
+                        <td> Note </td><td><force:inputField aura:id="Note" value="{!v.newAccount.Description}"/></td>
+                    </tr>
+                    <tr>
+                        <td> Categories</td><td><force:inputField aura:id="Categories" value="{!v.newAccount.Categories_del__c}"/></td>
+                    </tr>
+                    <tr>
+                        <td>SubCategories</td><td><force:inputField aura:id="SubCategories" value="{!v.newAccount.Sub_Categories__c    }"/></td>
+                    </tr>
+                    <tr>
+                        <td>Assign to</td><td> <force:inputField aura:id="kbid" required="true" value="{!v.newAccount.Assigned_To__c}" change="{!c.GetId}" class="LkField"/></td>
+                    </tr>
+                    <tr>
+                        <td> Billing Street </td><td><force:inputField aura:id="Street " value="{!v.newAccount.BillingStreet}"/></td>
+                    </tr>
+                    <tr>
+                        <td> Billing City </td><td><force:inputField aura:id="City" value="{!v.newAccount.BillingCity}"/></td>
+                    </tr>
+                    <tr>
+                        <td>Billing State </td><td><force:inputField aura:id="State" value="{!v.newAccount.BillingState}"/></td>
+                    </tr>
+                    <tr>
+                        <td> Billing Country </td><td><force:inputField aura:id="Country" value="{!v.newAccount.BillingCountry}"/></td>
+                    </tr>
+                    <tr>
+                        <td> Billing Postal Code</td><td><force:inputField aura:id="Postal Code" value="{!v.newAccount.BillingPostalCode}"/></td>
+                    </tr>
+                    <tr>
+                    	<td><lightning:button label="Save" onclick="{!c.createAccount}" /></td>
+                    </tr>
+                    
+                </table>
+               
+        </center>
+    </div>
+</aura:component>
+
+
+<--Js Controller-->
+({
+   
+	createAccount : function(component, event) {
+        
+    var newAcc = component.get("v.newAccount");
+    var assignId=component.get("v.AssignId");
+    var action = component.get("c.saveAccount");
+    action.setParams({
+        "acc": newAcc,
+        "AssignId":assignId
+    });
+    action.setCallback(this, function(a) {
+           var state = a.getState();
+            if (state === "SUCCESS") {
+                var name = a.getReturnValue();
+                alert("Account inserted: "+name);
+            }
+        });
+    $A.enqueueAction(action);
+},
+    GetId:function(component,event,helper)
+    {
+        var AssignId = event.getParam("value");
+        console.log("current value: " +AssignId);
+        component.set("v.AssignId",AssignId);
+    }
+   
+})
+
+<!--Apex Controller-->
+public class AccountController {
+@AuraEnabled
+    
+    public static Account saveAccount (Account acc,Id aid) {
+        acc.Assigned_To__r = null;
+        acc.Assigned_To__c = aid;
+        insert acc;
+        return acc;
+    }
+}
